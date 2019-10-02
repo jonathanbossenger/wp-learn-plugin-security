@@ -21,7 +21,6 @@ function wcjhb_setup_table() {
 
 	$sql = "CREATE TABLE $table_name (
 	  id mediumint(9) NOT NULL AUTO_INCREMENT,
-	  time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 	  name varchar (100) NOT NULL,
 	  email varchar (100) NOT NULL,
 	  PRIMARY KEY  (id)
@@ -29,6 +28,21 @@ function wcjhb_setup_table() {
 
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $sql );
+}
+
+/**
+ * Enqueue Scripts
+ */
+add_action( 'admin_enqueue_scripts', 'wcjhb_add_page_scripts_enqueue_script' );
+function wcjhb_add_page_scripts_enqueue_script() {
+	wp_enqueue_script( 'wcjhb-admin', 'assets/js/admin.js', array( 'jquery' ), '1.0.0', true );
+	wp_localize_script(
+		'wcjhb-admin',
+		'wcjhb_ajax',
+		array(
+			'ajax_url' => admin_url( 'admin-ajax.php' ),
+		)
+	);
 }
 
 /**
@@ -64,6 +78,9 @@ function wcjhb_form_shortcode() {
  */
 add_action( 'wp', 'wcjhb_maybe_process_form' );
 function wcjhb_maybe_process_form() {
+	if (!isset($_POST['wcjhb_form'])){
+		return;
+	}
 	$name = $_POST['name'];
 	$email = $_POST['email'];
 
@@ -84,10 +101,64 @@ function wcjhb_maybe_process_form() {
 }
 
 // administrator only page that shows form submissions without any user cap checks
-add_action( 'wp_ajax_update_form_submission', 'wcjhb_ajax_get_form_submissions' );
-function wcjhb_ajax_get_form_submissions() {
-	// retrieve form submissions via ajax
+
+function wcjhb_submenu() {
+	add_menu_page(
+		esc_html__( 'WCJHB Admin Page', 'wcjhb' ),
+		esc_html__( 'WCJHB Admin Page', 'wcjhb' ),
+		'manage_options',
+		'wcjhb_admin',
+		'wcjhb_render_admin_page',
+		'dashicons-admin-tools'
+	);
 }
+
+add_action( 'admin_menu', 'wcjhb_submenu', 11 );
+function wcjhb_render_admin_page(){
+	$submissions = wcjhb_get_form_submissions();
+	?>
+	<div class="wrap" id="wcjhb_admin">
+		<h1>Admin</h1>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Email</th>
+				</tr>
+			</thead>
+			<?php foreach ($submissions as $submission){ ?>
+				<tr>
+					<td><?php echo $submission->name?></td>
+					<td><?php echo $submission->email?></td>
+					<td><a id="delete-submission" data-id="<?php echo $submission->id?>">Delete</a></td>
+				</tr>
+			<?php } ?>
+		</table>
+	</div>
+	<?php
+}
+
+add_action('wp_ajax_delete_form_submission', 'wcjhb_delete_form_submission');
+function wcjhb_delete_form_submission( $id ) {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'form_submissions';
+
+	$sql     = "DELETE FROM $table_name WHERE id = $id";
+	$results = $wpdb->get_results( $sql );
+
+	return $results;
+}
+
+function wcjhb_get_form_submissions() {
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'form_submissions';
+
+	$sql     = "SELECT * FROM $table_name";
+	$results = $wpdb->get_results( $sql );
+
+	return $results;
+}
+
 
 
 
