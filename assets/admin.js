@@ -1,9 +1,11 @@
 jQuery(document).ready(function ($) {
-
-	$('#delete-submission').on('clilck', function (event){
+	console.log('WCJHB admin.js loaded');
+	$('.delete-submission').on('click', function (event){
+		console.log('Delete button clicked');
 		var this_button = $(this);
 		event.preventDefault();
 		var id = this_button.data('id');
+		console.log('Delete submission id ' + id);
 		jQuery.post(
 			wcjhb_ajax.ajax_url,
 			{
@@ -11,6 +13,8 @@ jQuery(document).ready(function ($) {
 				'id': id,
 			},
 			function( response ){
+				console.log(response);
+				alert('Form submission deleted');
 				document.location.reload();
 			}
 		);
