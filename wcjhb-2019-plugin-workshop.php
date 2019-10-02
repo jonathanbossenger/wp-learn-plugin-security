@@ -19,15 +19,13 @@ function wcjhb_setup_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
-	$charset_collate = $wpdb->get_charset_collate();
-
 	$sql = "CREATE TABLE $table_name (
 	  id mediumint(9) NOT NULL AUTO_INCREMENT,
 	  time datetime DEFAULT '0000-00-00 00:00:00' NOT NULL,
 	  name varchar (100) NOT NULL,
 	  email varchar (100) NOT NULL,
 	  PRIMARY KEY  (id)
-	) $charset_collate;";
+	)";
 
 	require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 	dbDelta( $sql );
@@ -68,17 +66,26 @@ add_action( 'wp', 'wcjhb_maybe_process_form' );
 function wcjhb_maybe_process_form() {
 	$name = $_POST['name'];
 	$email = $_POST['email'];
-	// insert form data into form_submissions table insecurely
-	// echo insecure front end content
-	?>
-	<div>Form submitted successfully</div>
-	<?php
+
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'form_submissions';
+
+	$sql = "INSERT INTO $table_name ('name', 'email') VALUES ($name, $email)";
+	$result = $wpdb->query($sql);
+	if (0 < $result){
+		?>
+		<div>Thanks, <?php echo $name ?>. Your submission has been processed</div>
+		<?php
+	}else {
+		?>
+		<div>Sorry, <?php echo $name ?>. Something went wrong</div>
+		<?php
+	}
 }
 
-// admin page that shows form submissions without any user cap checks
-
-add_action('wp_ajax_update_form_submission');
-function wcjhb_ajax_get_form_submissions(){
+// administrator only page that shows form submissions without any user cap checks
+add_action( 'wp_ajax_update_form_submission', 'wcjhb_ajax_get_form_submissions' );
+function wcjhb_ajax_get_form_submissions() {
 	// retrieve form submissions via ajax
 }
 
