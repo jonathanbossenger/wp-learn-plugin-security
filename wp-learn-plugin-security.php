@@ -142,6 +142,12 @@ function wp_learn_submenu() {
  */
 function wp_learn_render_admin_page(){
 	$submissions = wp_learn_get_form_submissions();
+	/**
+	 * 03. Escape the data
+	 * https://developer.wordpress.org/apis/security/escaping/
+	 * Escape the name and email values
+	 * Cast the ID to an integer
+	 */
 	?>
 	<div class="wrap" id="wp_learn_admin">
 		<h1>Admin</h1>
@@ -154,9 +160,9 @@ function wp_learn_render_admin_page(){
 			</thead>
 			<?php foreach ($submissions as $submission){ ?>
 				<tr>
-					<td><?php echo $submission->name?></td>
-					<td><?php echo $submission->email?></td>
-					<td><a class="delete-submission" data-id="<?php echo $submission->id?>" style="cursor:pointer;">Delete</a></td>
+					<td><?php echo esc_html( $submission->name ); ?></td>
+					<td><?php echo esc_html( $submission->email ); ?></td>
+					<td><a class="delete-submission" data-id="<?php echo (int) $submission->id?>" style="cursor:pointer;">Delete</a></td>
 				</tr>
 			<?php } ?>
 		</table>
