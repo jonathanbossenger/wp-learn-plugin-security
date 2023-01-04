@@ -184,7 +184,17 @@ function wp_learn_get_form_submissions() {
  */
 add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
 function wp_learn_delete_form_submission() {
-	$id = $_POST['id'];
+	/**
+	 * 02. Validate the incoming data
+	 * https://developer.wordpress.org/apis/security/data-validation/
+	 * Make sure that the id has been POSTed
+	 * Make sure that the id is an integer
+	 */
+	if ( ! isset( $_POST['id'] ) ) {
+		wp_send_json_error( 'Invalid ID' );
+	}
+	$id = (int) $_POST['id'];
+
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
