@@ -100,8 +100,13 @@ function wp_learn_maybe_process_form() {
 	if (!isset($_POST['wp_learn_form'])){
 		return;
 	}
-	$name = $_POST['name'];
-	$email = $_POST['email'];
+
+	/**
+	 * 01. Sanitize the data
+	 * https://developer.wordpress.org/apis/security/sanitizing/
+	 */
+	$name = sanitize_text_field( $_POST['name'] );
+	$email = sanitize_text_field( $_POST['email'] );
 
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
