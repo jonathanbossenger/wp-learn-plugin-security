@@ -1,11 +1,10 @@
 <?php
 /**
- * Plugin Name:     Wcjhb 2019 Plugin Workshop
- * Plugin URI:      https://johannesburg.wordcamp.org
- * Description:     Badly coded Workshop Plugin
+ * Plugin Name:     WP Learn Plugin Security
+ * Description:     Badly coded Plugin
  * Author:          Jonathan Bossenger
  * Author URI:      https://jonthanbossenger.com
- * Text Domain:     wcjhb
+ * Text Domain:     wp-learning-plugin-security
  * Domain Path:     /languages
  * Version:         1.0.0
  *
@@ -15,18 +14,20 @@
 /**
  * Update these with the page slugs of your success and error pages
  */
-define( 'WCJHB_SUCCESS_PAGE_SLUG', 'form-success-page' );
-define( 'WCJHB_ERROR_PAGE_SLUG', 'form-error-page' );
+define( 'WPLEARN_SUCCESS_PAGE_SLUG', 'form-success-page' );
+define( 'WPLEARN_ERROR_PAGE_SLUG', 'form-error-page' );
 
-define( 'WCJHB_VERSION', '1.0.0' );
-define( 'WCJHB_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'WCJHB_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+/**
+ * Setting up some URL constants
+ */
+define( 'WPLEARN_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'WPLEARN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
 
 /**
  * Set up the required form submissions table
  */
-register_activation_hook( __FILE__, 'wcjhb_setup_table' );
-function wcjhb_setup_table() {
+register_activation_hook( __FILE__, 'wp_learn_setup_table' );
+function wp_learn_setup_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
@@ -44,19 +45,19 @@ function wcjhb_setup_table() {
 /**
  * Enqueue JavaScript assets
  */
-add_action( 'admin_enqueue_scripts', 'wcjhb_enqueue_script' );
-function wcjhb_enqueue_script() {
+add_action( 'admin_enqueue_scripts', 'wp_learn_enqueue_script' );
+function wp_learn_enqueue_script() {
 	wp_register_script(
-		'wcjhb-admin',
-		WCJHB_PLUGIN_URL . 'assets/admin.js',
+		'wp_learn-admin',
+		WPLEARN_PLUGIN_URL . 'assets/admin.js',
 		array( 'jquery' ),
 		'1.0.0',
 		true
 	);
-	wp_enqueue_script( 'wcjhb-admin' );
+	wp_enqueue_script( 'wp_learn-admin' );
 	wp_localize_script(
-		'wcjhb-admin',
-		'wcjhb_ajax',
+		'wp_learn-admin',
+		'wp_learn_ajax',
 		array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
 		)
@@ -67,12 +68,12 @@ function wcjhb_enqueue_script() {
  * Submission Form
  * https://developer.wordpress.org/reference/functions/add_shortcode/
  */
-add_shortcode( 'wcjhb_form_shortcode', 'wcjhb_form_shortcode' );
-function wcjhb_form_shortcode() {
+add_shortcode( 'wp_learn_form_shortcode', 'wp_learn_form_shortcode' );
+function wp_learn_form_shortcode() {
 	ob_start();
 	?>
 	<form method="post">
-		<input type="hidden" name="wcjhb_form" value="submit">
+		<input type="hidden" name="wp_learn_form" value="submit">
 		<div>
 			<label for="email">Name</label>
 			<input type="text" id="name" name="name" placeholder="Name">
@@ -94,9 +95,9 @@ function wcjhb_form_shortcode() {
  * Process the form data and redirect
  * https://developer.wordpress.org/reference/hooks/wp/
  */
-add_action( 'wp', 'wcjhb_maybe_process_form' );
-function wcjhb_maybe_process_form() {
-	if (!isset($_POST['wcjhb_form'])){
+add_action( 'wp', 'wp_learn_maybe_process_form' );
+function wp_learn_maybe_process_form() {
+	if (!isset($_POST['wp_learn_form'])){
 		return;
 	}
 	$name = $_POST['name'];
@@ -108,25 +109,25 @@ function wcjhb_maybe_process_form() {
 	$sql = "INSERT INTO $table_name (name, email) VALUES ('$name', '$email')";
 	$result = $wpdb->query($sql);
 	if ( 0 < $result ) {
-		wp_redirect( WCJHB_SUCCESS_PAGE_SLUG );
+		wp_redirect( WPLEARN_SUCCESS_PAGE_SLUG );
 		die();
 	}
 
-	wp_redirect( WCJHB_ERROR_PAGE_SLUG );
+	wp_redirect( WPLEARN_ERROR_PAGE_SLUG );
 	die();
 }
 
 /**
  * Create an admin page to show the form submissions
  */
-add_action( 'admin_menu', 'wcjhb_submenu', 11 );
-function wcjhb_submenu() {
+add_action( 'admin_menu', 'wp_learn_submenu', 11 );
+function wp_learn_submenu() {
 	add_menu_page(
-		esc_html__( 'WCJHB Admin Page', 'wcjhb' ),
-		esc_html__( 'WCJHB Admin Page', 'wcjhb' ),
+		esc_html__( 'WP Learn Admin Page', 'wp_learn' ),
+		esc_html__( 'WP Learn Admin Page', 'wp_learn' ),
 		'manage_options',
-		'wcjhb_admin',
-		'wcjhb_render_admin_page',
+		'wp_learn_admin',
+		'wp_learn_render_admin_page',
 		'dashicons-admin-tools'
 	);
 }
@@ -134,10 +135,10 @@ function wcjhb_submenu() {
 /**
  * Render the form submissions admin page
  */
-function wcjhb_render_admin_page(){
-	$submissions = wcjhb_get_form_submissions();
+function wp_learn_render_admin_page(){
+	$submissions = wp_learn_get_form_submissions();
 	?>
-	<div class="wrap" id="wcjhb_admin">
+	<div class="wrap" id="wp_learn_admin">
 		<h1>Admin</h1>
 		<table>
 			<thead>
@@ -163,7 +164,7 @@ function wcjhb_render_admin_page(){
  *
  * @return array|object|null
  */
-function wcjhb_get_form_submissions() {
+function wp_learn_get_form_submissions() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
@@ -176,13 +177,13 @@ function wcjhb_get_form_submissions() {
 /**
  * Ajax Hook to delete the form submissions
  */
-add_action( 'wp_ajax_delete_form_submission', 'wcjhb_delete_form_submission' );
-function wcjhb_delete_form_submission() {
+add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
+function wp_learn_delete_form_submission() {
 	$id = $_POST['id'];
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
-	$sql     = "DELETE FROM $table_name WHERE id = $id";
+	$sql    = "DELETE FROM $table_name WHERE id = $id";
 	$result = $wpdb->get_results( $sql );
 
 	return wp_send_json( array( 'result' => $result ) );
