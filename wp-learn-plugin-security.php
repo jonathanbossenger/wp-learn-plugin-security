@@ -213,6 +213,14 @@ function wp_learn_get_form_submissions() {
 add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
 function wp_learn_delete_form_submission() {
 	/**
+	 * 05. Check user capabilities
+	 * https://developer.wordpress.org/apis/security/user-roles-and-capabilities/
+	 */
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return wp_send_json( array( 'result' => 'Authentication error' ) );
+	}
+
+	/**
 	 * 04 (a). Verify the ajax nonce
 	 * https://developer.wordpress.org/apis/security/nonces/
 	 */
