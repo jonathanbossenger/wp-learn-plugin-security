@@ -56,7 +56,7 @@ function wp_learn_enqueue_script() {
 	);
 	wp_enqueue_script( 'wp_learn-admin' );
 	/**
-	 * 04. Add an ajax nonce to the script
+	 * 04 (a). Add an ajax nonce to the script
 	 * https://developer.wordpress.org/apis/security/nonces/
 	 */
 	$ajax_nonce = wp_create_nonce( 'wp_learn_ajax_nonce' );
@@ -197,7 +197,7 @@ function wp_learn_get_form_submissions() {
 add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
 function wp_learn_delete_form_submission() {
 	/**
-	 * 04. Verify the ajax nonce
+	 * 04 (a). Verify the ajax nonce
 	 * https://developer.wordpress.org/apis/security/nonces/
 	 */
 	check_ajax_referer( 'wp_learn_ajax_nonce' );
