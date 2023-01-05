@@ -79,6 +79,13 @@ function wp_learn_form_shortcode() {
 	ob_start();
 	?>
 	<form method="post">
+		<?php
+		/**
+		 * 04 (b). Add a nonce to the form
+		 * https://developer.wordpress.org/apis/security/nonces/
+		 */
+		wp_nonce_field( 'wp_learn_form_nonce_action', 'wp_learn_form_nonce_field' );
+		?>
 		<input type="hidden" name="wp_learn_form" value="submit">
 		<div>
 			<label for="email">Name</label>
@@ -105,6 +112,15 @@ add_action( 'wp', 'wp_learn_maybe_process_form' );
 function wp_learn_maybe_process_form() {
 	if (!isset($_POST['wp_learn_form'])){
 		return;
+	}
+
+	/**
+	 * 04 (b). Verify the nonce
+	 * https://developer.wordpress.org/apis/security/nonces/
+	 */
+	if ( ! isset( $_POST['wp_learn_form_nonce_field'] ) || ! wp_verify_nonce( $_POST['wp_learn_form_nonce_field'], 'wp_learn_form_nonce_action' ) ) {
+		wp_redirect( WPLEARN_ERROR_PAGE_SLUG );
+		die();
 	}
 
 	/**
@@ -201,7 +217,7 @@ function wp_learn_delete_form_submission() {
 	 * https://developer.wordpress.org/apis/security/nonces/
 	 */
 	check_ajax_referer( 'wp_learn_ajax_nonce' );
-	
+
 	/**
 	 * 02. Validate the incoming data
 	 * https://developer.wordpress.org/apis/security/data-validation/
