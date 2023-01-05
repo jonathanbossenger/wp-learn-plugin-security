@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name:     WP Learn Plugin Security
- * Description:     Badly coded Plugin
+ * Description:     More secure Plugin
  * Author:          Jonathan Bossenger
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         1.0.0
+ * Version:         2.0.0
  *
  * @package         WP_Learn_Plugin_Security
  */
@@ -51,7 +51,7 @@ function wp_learn_enqueue_script() {
 		'wp_learn-admin',
 		WPLEARN_PLUGIN_URL . 'assets/admin.js',
 		array( 'jquery' ),
-		'1.0.0',
+		'2.0.0',
 		true
 	);
 	wp_enqueue_script( 'wp_learn-admin' );
