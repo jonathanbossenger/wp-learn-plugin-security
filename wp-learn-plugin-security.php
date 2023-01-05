@@ -4,11 +4,11 @@
  * Description:     Badly coded Plugin
  * Author:          Jonathan Bossenger
  * Author URI:      https://jonthanbossenger.com
- * Text Domain:     wp-learning-plugin-security
+ * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
  * Version:         1.0.0
  *
- * @package         Wcjhb_2019_Plugin_Workshop
+ * @package         WP_Learn_Plugin_Security
  */
 
 /**
