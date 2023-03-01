@@ -138,13 +138,13 @@ function wp_learn_maybe_process_form() {
  */
 add_action( 'admin_menu', 'wp_learn_submenu', 11 );
 function wp_learn_submenu() {
-	add_menu_page(
+	add_submenu_page(
+		'tools.php',
 		esc_html__( 'WP Learn Admin Page', 'wp_learn' ),
 		esc_html__( 'WP Learn Admin Page', 'wp_learn' ),
 		'manage_options',
 		'wp_learn_admin',
-		'wp_learn_render_admin_page',
-		'dashicons-admin-tools'
+		'wp_learn_render_admin_page'
 	);
 }
 
