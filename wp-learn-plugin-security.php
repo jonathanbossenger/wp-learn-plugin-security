@@ -43,20 +43,20 @@ function wp_learn_setup_table() {
 }
 
 /**
- * Enqueue JavaScript assets
+ * Enqueue Admin assets
  */
 add_action( 'admin_enqueue_scripts', 'wp_learn_enqueue_script' );
 function wp_learn_enqueue_script() {
 	wp_register_script(
-		'wp_learn-admin',
+		'wp-learn-admin',
 		WPLEARN_PLUGIN_URL . 'assets/admin.js',
 		array( 'jquery' ),
 		'1.0.0',
 		true
 	);
-	wp_enqueue_script( 'wp_learn-admin' );
+	wp_enqueue_script( 'wp-learn-admin' );
 	wp_localize_script(
-		'wp_learn-admin',
+		'wp-learn-admin',
 		'wp_learn_ajax',
 		array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
@@ -65,27 +65,43 @@ function wp_learn_enqueue_script() {
 }
 
 /**
+ * Enqueue Frontend assets
+ */
+add_action( 'wp_enqueue_scripts', 'wp_learn_enqueue_script_frontend' );
+function wp_learn_enqueue_script_frontend() {
+	wp_register_style(
+		'wp-learn-style',
+		WPLEARN_PLUGIN_URL . 'assets/style.css',
+		array(),
+		'1.0.0'
+	);
+	wp_enqueue_style( 'wp-learn-style' );
+}
+
+/**
  * Submission Form
  * https://developer.wordpress.org/reference/functions/add_shortcode/
  */
 add_shortcode( 'wp_learn_form_shortcode', 'wp_learn_form_shortcode' );
-function wp_learn_form_shortcode() {
+function wp_learn_form_shortcode( $atts ) {
 	ob_start();
 	?>
-	<form method="post">
-		<input type="hidden" name="wp_learn_form" value="submit">
-		<div>
-			<label for="email">Name</label>
-			<input type="text" id="name" name="name" placeholder="Name">
-		</div>
-		<div>
-			<label for="email">Email address</label>
-			<input type="text" id="email" name="email" placeholder="Email address">
-		</div>
-		<div>
-			<input type="submit" id="submit" name="submit" value="Submit">
-		</div>
-	</form>
+	<div id="wp_learn_form" class="<?php echo $atts['class'] ?>">
+		<form method="post">
+			<input type="hidden" name="wp_learn_form" value="submit">
+			<div>
+				<label for="email">Name</label>
+				<input type="text" id="name" name="name" placeholder="Name">
+			</div>
+			<div>
+				<label for="email">Email address</label>
+				<input type="text" id="email" name="email" placeholder="Email address">
+			</div>
+			<div>
+				<input type="submit" id="submit" name="submit" value="Submit">
+			</div>
+		</form>
+	</div>
 	<?php
 	$form = ob_get_clean();
 	return $form;
