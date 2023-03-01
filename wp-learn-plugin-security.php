@@ -88,6 +88,9 @@ function wp_learn_form_shortcode( $atts ) {
 	?>
 	<div id="wp_learn_form" class="<?php echo $atts['class'] ?>">
 		<form method="post">
+			<?php
+				wp_nonce_field( 'wp_learn_form_nonce_action', 'wp_learn_form_nonce_field' );
+			?>
 			<input type="hidden" name="wp_learn_form" value="submit">
 			<div>
 				<label for="email">Name</label>
@@ -116,15 +119,26 @@ function wp_learn_maybe_process_form() {
 	if (!isset($_POST['wp_learn_form'])){
 		return;
 	}
-	$name = $_POST['name'];
-	$email = $_POST['email'];
+
+	if ( ! isset( $_POST['wp_learn_form_nonce_field'] ) || ! wp_verify_nonce( $_POST['wp_learn_form_nonce_field'], 'wp_learn_form_nonce_action' ) ) {
+		wp_redirect( WPLEARN_ERROR_PAGE_SLUG );
+		die();
+	}
+
+	$name = sanitize_term_field($_POST['name']);
+	$email = sanitize_email($_POST['email']);
 
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
-	$sql = "INSERT INTO $table_name (name, email) VALUES ('$name', '$email')";
-	$result = $wpdb->query($sql);
-	if ( 0 < $result ) {
+	$rows = $wpdb->insert(
+		$table_name,
+		array(
+			'name' => $name,
+			'email' => $email,
+		)
+	);
+	if ( 0 < $rows ) {
 		wp_redirect( WPLEARN_SUCCESS_PAGE_SLUG );
 		die();
 	}
@@ -165,9 +179,9 @@ function wp_learn_render_admin_page(){
 			</thead>
 			<?php foreach ($submissions as $submission){ ?>
 				<tr>
-					<td><?php echo $submission->name?></td>
-					<td><?php echo $submission->email?></td>
-					<td><a class="delete-submission" data-id="<?php echo $submission->id?>" style="cursor:pointer;">Delete</a></td>
+					<td><?php echo esc_html($submission->name)?></td>
+					<td><?php echo esc_html($submission->email)?></td>
+					<td><a class="delete-submission" data-id="<?php echo (int) $submission->id?>" style="cursor:pointer;">Delete</a></td>
 				</tr>
 			<?php } ?>
 		</table>
@@ -195,13 +209,19 @@ function wp_learn_get_form_submissions() {
  */
 add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
 function wp_learn_delete_form_submission() {
-	$id = $_POST['id'];
+
+	check_ajax_referer( 'wp_learn_ajax_nonce' );
+
+	$id = (int) $_POST['id'];
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
-	$sql    = "DELETE FROM $table_name WHERE id = $id";
-	$result = $wpdb->get_results( $sql );
-
+	$rows_deleted = $wpdb->delete( $table_name, array( 'id' => $id ) );
+	if ( 0 < $rows_deleted ) {
+		$result = 'success';
+	} else {
+		$result = 'error';
+	}
 	return wp_send_json( array( 'result' => $result ) );
 }
 
