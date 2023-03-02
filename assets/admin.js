@@ -12,6 +12,7 @@ jQuery( document ).ready(
 				jQuery.post(
 					wp_learn_ajax.ajax_url,
 					{
+						'_ajax_nonce': wp_learn_ajax.nonce,
 						'action': 'delete_form_submission',
 						'id': id,
 					},
