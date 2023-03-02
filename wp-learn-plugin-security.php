@@ -6,7 +6,7 @@
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         1.0.0
+ * Version:         1.0.2
  *
  * @package         WP_Learn_Plugin_Security
  */
@@ -51,7 +51,7 @@ function wp_learn_enqueue_script() {
 		'wp-learn-admin',
 		WPLEARN_PLUGIN_URL . 'assets/admin.js',
 		array( 'jquery' ),
-		'1.0.0',
+		'1.0.2',
 		true
 	);
 	wp_enqueue_script( 'wp-learn-admin' );
@@ -76,7 +76,7 @@ function wp_learn_enqueue_script_frontend() {
 		'wp-learn-style',
 		WPLEARN_PLUGIN_URL . 'assets/style.css',
 		array(),
-		'1.0.0'
+		'1.0.2'
 	);
 	wp_enqueue_style( 'wp-learn-style' );
 }
@@ -128,8 +128,8 @@ function wp_learn_maybe_process_form() {
 		die();
 	}
 
-	$name = sanitize_term_field($_POST['name']);
-	$email = sanitize_email($_POST['email']);
+	$name  = sanitize_text_field( $_POST['name'] );
+	$email = sanitize_email( $_POST['email'] );
 
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
