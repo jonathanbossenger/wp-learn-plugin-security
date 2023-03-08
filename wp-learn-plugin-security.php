@@ -6,7 +6,7 @@
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         1.0.2
+ * Version:         1.0.2-beta
  *
  * @package         WP_Learn_Plugin_Security
  */
@@ -56,13 +56,11 @@ function wp_learn_enqueue_script() {
 	);
 	wp_enqueue_script( 'wp-learn-admin' );
 
-	$ajax_nonce = wp_create_nonce( 'wp_learn_ajax_nonce' );
 	wp_localize_script(
 		'wp-learn-admin',
 		'wp_learn_ajax',
 		array(
 			'ajax_url' => admin_url( 'admin-ajax.php' ),
-			'nonce'    => $ajax_nonce,
 		)
 	);
 }
@@ -92,11 +90,8 @@ function wp_learn_form_shortcode( $atts ) {
 	}
 	ob_start();
 	?>
-	<div id="wp_learn_form" class="<?php echo $atts['class'] ?>">
+	<div id="wp_learn_form" class="<?php echo esc_attr( $atts['class'] ) ?>">
 		<form method="post">
-			<?php
-				wp_nonce_field( 'wp_learn_form_nonce_action', 'wp_learn_form_nonce_field' );
-			?>
 			<input type="hidden" name="wp_learn_form" value="submit">
 			<div>
 				<label for="email">Name</label>
@@ -124,11 +119,6 @@ add_action( 'wp', 'wp_learn_maybe_process_form' );
 function wp_learn_maybe_process_form() {
 	if (!isset($_POST['wp_learn_form'])){
 		return;
-	}
-
-	if ( ! isset( $_POST['wp_learn_form_nonce_field'] ) || ! wp_verify_nonce( $_POST['wp_learn_form_nonce_field'], 'wp_learn_form_nonce_action' ) ) {
-		wp_safe_redirect( WPLEARN_ERROR_PAGE_SLUG );
-		die();
 	}
 
 	$name  = sanitize_text_field( $_POST['name'] );
@@ -215,8 +205,6 @@ function wp_learn_get_form_submissions() {
  */
 add_action( 'wp_ajax_delete_form_submission', 'wp_learn_delete_form_submission' );
 function wp_learn_delete_form_submission() {
-	check_ajax_referer( 'wp_learn_ajax_nonce' );
-
 	if ( ! current_user_can( 'manage_options' ) ) {
 		return wp_send_json( array( 'result' => 'Authentication error' ) );
 	}
