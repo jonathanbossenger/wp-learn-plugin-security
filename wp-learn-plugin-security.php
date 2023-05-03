@@ -6,7 +6,7 @@
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         1.0.2-beta
+ * Version:         1.0.1
  *
  * @package         WP_Learn_Plugin_Security
  */
