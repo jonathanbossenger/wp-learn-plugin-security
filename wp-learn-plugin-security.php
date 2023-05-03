@@ -84,9 +84,12 @@ function wp_learn_enqueue_script_frontend() {
  */
 add_shortcode( 'wp_learn_form_shortcode', 'wp_learn_form_shortcode' );
 function wp_learn_form_shortcode( $atts ) {
-	if (! isset( $atts['class'] ) ) {
-		$atts['class'] = 'red';
-	}
+	$atts = shortcode_atts (
+		array(
+			'class' => 'red',
+		),
+		$atts
+	);
 	ob_start();
 	?>
 	<div id="wp_learn_form" class="<?php echo $atts['class'] ?>">
