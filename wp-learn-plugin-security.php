@@ -6,7 +6,7 @@
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         2.0.0
+ * Version:         1.0.2
  *
  * @package         WP_Learn_Plugin_Security
  */
@@ -75,30 +75,38 @@ function wp_learn_enqueue_script() {
  * https://developer.wordpress.org/reference/functions/add_shortcode/
  */
 add_shortcode( 'wp_learn_form_shortcode', 'wp_learn_form_shortcode' );
-function wp_learn_form_shortcode() {
+function wp_learn_form_shortcode( $atts ) {
+	$atts = shortcode_atts (
+		array(
+			'class' => 'red',
+		),
+		$atts
+	);
 	ob_start();
 	?>
-	<form method="post">
-		<?php
-		/**
-		 * 04 (b). Add a nonce to the form
-		 * https://developer.wordpress.org/apis/security/nonces/
-		 */
-		wp_nonce_field( 'wp_learn_form_nonce_action', 'wp_learn_form_nonce_field' );
-		?>
-		<input type="hidden" name="wp_learn_form" value="submit">
-		<div>
-			<label for="email">Name</label>
-			<input type="text" id="name" name="name" placeholder="Name">
-		</div>
-		<div>
-			<label for="email">Email address</label>
-			<input type="text" id="email" name="email" placeholder="Email address">
-		</div>
-		<div>
-			<input type="submit" id="submit" name="submit" value="Submit">
-		</div>
-	</form>
+	<div id="wp_learn_form" class="<?php echo $atts['class'] ?>">
+		<form method="post">
+			<?php
+			/**
+			 * 04 (b). Add a nonce to the form
+			 * https://developer.wordpress.org/apis/security/nonces/
+			 */
+			wp_nonce_field( 'wp_learn_form_nonce_action', 'wp_learn_form_nonce_field' );
+			?>
+			<input type="hidden" name="wp_learn_form" value="submit">
+			<div>
+				<label for="email">Name</label>
+				<input type="text" id="name" name="name" placeholder="Name">
+			</div>
+			<div>
+				<label for="email">Email address</label>
+				<input type="text" id="email" name="email" placeholder="Email address">
+			</div>
+			<div>
+				<input type="submit" id="submit" name="submit" value="Submit">
+			</div>
+		</form>
+	</div>
 	<?php
 	$form = ob_get_clean();
 	return $form;
