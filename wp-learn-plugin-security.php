@@ -27,7 +27,21 @@ define( 'WPLEARN_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
  * Set up the required form submissions table
  */
 register_activation_hook( __FILE__, 'wp_learn_setup_table' );
-function wp_learn_setup_table() {
+function wp_learn_setup_table( $network_wide ) {
+	if ( is_multisite() && $network_wide ) {
+		global $wpdb;
+		$blog_ids = $wpdb->get_col( "SELECT blog_id FROM $wpdb->blogs" );
+		foreach ( $blog_ids as $blog_id ) {
+			switch_to_blog( $blog_id );
+			wp_learn_create_table();
+			restore_current_blog();
+		}
+	} else {
+		wp_learn_create_table();
+	}
+}
+
+function wp_learn_create_table(){
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'form_submissions';
 
