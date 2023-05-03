@@ -6,7 +6,7 @@
  * Author URI:      https://jonthanbossenger.com
  * Text Domain:     wp-learn-plugin-security
  * Domain Path:     /languages
- * Version:         1.0.2
+ * Version:         1.0.4
  *
  * @package         WP_Learn_Plugin_Security
  */
@@ -65,7 +65,7 @@ function wp_learn_enqueue_script() {
 		'wp-learn-admin',
 		WPLEARN_PLUGIN_URL . 'assets/admin.js',
 		array( 'jquery' ),
-		'1.0.2',
+		'1.0.4',
 		true
 	);
 	wp_enqueue_script( 'wp-learn-admin' );
